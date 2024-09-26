@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Integration</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Pay Now, Buy Later</h1>
+    <button id="rzp-button">Pay Now</button>
+
+    <script>
+        document.getElementById('rzp-button').onclick = function(e) {
+            fetch('/create_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: 50000 // Amount in paise (500.00 INR)
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var options = {
+                    "key": "rzp_test_xxcVSfcWJgOsYT", // Enter the Key ID generated from the Dashboard
+                    "amount": data.amount, // Amount is in currency subunits. Default is INR
+                    "currency": "INR",
+                    "name": "My Store",
+                    "description": "Test Transaction",
+                    "order_id": data.id, // Pass the order_id
+                    "handler": function (response){
+                        alert("Payment successful. Payment ID: " + response.razorpay_payment_id);
+                    },
+                    "prefill": {
+                        "name": "Customer Name",
+                        "email": "customer@example.com",
+                        "contact": "9999999999"
+                    },
+                    "theme": {
+                        "color": "#F37254"
+                    }
+                };
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+                e.preventDefault();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
